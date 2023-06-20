@@ -30,26 +30,33 @@ struct ContentView: View {
             Group{
                 Spacer()
                 Spacer()
-                Text("현재 라운드:\(presentRound) / 총라운드: \(totalRound)")
+                HStack {
+                    Spacer()
+                    Text("현재 라운드:\(presentRound) ")
+                }
+                HStack {
+                    Spacer()
+                    Text("총라운드: \(totalRound) ")
+                }
                 Spacer()
                 Spacer()
-            }.imageScale(.large)
-             .foregroundColor(.accentColor)
+            }   .font(.custom("", fixedSize: 20))
+                .foregroundColor(.gray)
             Group{
                 switch (condition) {
                 case 0:
-                    Text("게임을 시작 하겠습니다.")
+                    Text("게임을 시작 하겠습니다.").font(.largeTitle)
                     Button {
                         answerNumber = returnAnswerNumber(flagNumber, firstNumber, secondNumber)
                         condition = 1
-                        presentRound += 1
+                        presentRound = 1
                     }label: {
                         Text("start!")
                     }.font(.largeTitle).foregroundColor(.mint)
                 case 1:
-                    Text("\(firstNumber) X \(secondNumber) = \(answerNumber)")
+                    Text("\(firstNumber) X \(secondNumber) = \(answerNumber)").font(.largeTitle)
                 case 2:
-                    Text("게임이 끝났습니다.")
+                    Text("게임이 끝났습니다.").font(.largeTitle)
                 default:
                     Text("error")
                 }
@@ -64,7 +71,7 @@ struct ContentView: View {
                 Spacer()
                 Button {
                     if condition == 1{
-                        if presentRound == 11 {
+                        if presentRound == 10 {
                             presentRound = 10
                             condition = 2
                             colorIndex = 0
@@ -105,7 +112,7 @@ struct ContentView: View {
                 Spacer()
                 
                 Button{
-                    if presentRound == 11 {
+                    if presentRound == 10 {
                         presentRound = 10
                         condition = 2
                         colorIndex = 0
