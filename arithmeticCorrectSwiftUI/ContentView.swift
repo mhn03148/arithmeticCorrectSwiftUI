@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State var showMessage: String = ""
-    @State var symbalName: String = ""
+    //@State var symbalName: String = ""
     @State var firstNumber: Int = Int.random(in: 0...10)
     @State var secondNumber: Int = Int.random(in: 0...10)
     @State var answerNumber: Int = 0
@@ -17,34 +17,43 @@ struct ContentView: View {
     @State var flagNumber: Int = Int.random(in: 0...2)
     @State var correctConunt: Int = 0
     @State var incorrectCount: Int = 0
-    @State var startBool: Bool = false
-    
+    @State var condition: Int = 0
+    @State var colorIndex: Int = 0
+    private var backgroundColors = [
+        Color.indigo.opacity(0.3),
+        Color.green.opacity(0.5),
+        Color.red.opacity(0.5)
+    ]
     let totalRound: Int = 10
     var body: some View {
         VStack {
             Group{
+                Spacer()
+                Spacer()
                 Text("현재 라운드:\(presentRound) / 총라운드: \(totalRound)")
                 Spacer()
                 Spacer()
-            }.imageScale(.large).foregroundColor(.accentColor)
-            
-            if startBool == false {
-                Text("게임을 시작 하겠습니다.")
-                Button {
-                    startBool = true
-                    answerNumber = returnAnswerNumber(flagNumber, firstNumber, secondNumber)
-                }label: {
-                    Text("start!")
-                }
-            }else {
-                if presentRound < 11 {
+            }.imageScale(.large)
+             .foregroundColor(.accentColor)
+            Group{
+                switch (condition) {
+                case 0:
+                    Text("게임을 시작 하겠습니다.")
+                    Button {
+                        answerNumber = returnAnswerNumber(flagNumber, firstNumber, secondNumber)
+                        condition = 1
+                        presentRound += 1
+                    }label: {
+                        Text("start!")
+                    }.font(.largeTitle).foregroundColor(.mint)
+                case 1:
                     Text("\(firstNumber) X \(secondNumber) = \(answerNumber)")
-                }else {
-                    Text("게임이 끝났습니다!")
-                    
+                case 2:
+                    Text("게임이 끝났습니다.")
+                default:
+                    Text("error")
                 }
-            }
-            
+            }.font(.title3)
             Spacer()
             HStack{
                 Text("맞춘 횟수: \(correctConunt)")
@@ -54,44 +63,83 @@ struct ContentView: View {
             HStack{
                 Spacer()
                 Button {
-                    if firstNumber * secondNumber == answerNumber && presentRound < 10{
-                    correctConunt += 1
-                    } else{
-                        incorrectCount += 1
-                    }
-                    if presentRound < 10 {
-                        presentRound += 1
-                        firstNumber = Int.random(in: 0...10)
-                        secondNumber = Int.random(in: 0...10)
-                        flagNumber = Int.random(in: 0...2)
-                        answerNumber = returnAnswerNumber(flagNumber, firstNumber, secondNumber)
+                    if condition == 1{
+                        if presentRound == 11 {
+                            presentRound = 10
+                            condition = 2
+                            colorIndex = 0
+                            /*
+                            if firstNumber * secondNumber == answerNumber {
+                                correctConunt += 1
+                                
+                            } else if firstNumber * secondNumber != answerNumber {
+                                incorrectCount += 1
+                            }
+                            state = 2
+                            
+                            return
+                             */
+                        } else{
+                            if firstNumber * secondNumber == answerNumber {
+                                correctConunt += 1
+                                colorIndex = 1
+                            } else if firstNumber * secondNumber != answerNumber {
+                                incorrectCount += 1
+                                colorIndex = 2
+                            }
+                            
+                            presentRound += 1
+                            firstNumber = Int.random(in: 0...10)
+                            secondNumber = Int.random(in: 0...10)
+                            flagNumber = Int.random(in: 0...2)
+                            answerNumber = returnAnswerNumber(flagNumber, firstNumber, secondNumber)
+                        }
                     }
                     
                 } label: {
                     Image(systemName: "circle.square")
                         .imageScale(.large)
-                        .foregroundColor(.accentColor)
+                        .foregroundColor(.blue)
                 }
                 
                 Spacer()
                 
                 Button{
-                    if firstNumber * secondNumber == answerNumber && presentRound < 10{
-                        incorrectCount += 1
-                    } else{
-                        correctConunt += 1
+                    if presentRound == 11 {
+                        presentRound = 10
+                        condition = 2
+                        colorIndex = 0
+                        /*
+                        if firstNumber * secondNumber == answerNumber {
+                            correctConunt += 1
+                        } else if firstNumber * secondNumber != answerNumber {
+                            incorrectCount += 1
+                        }
+                        state = 2
+                        
+                        return
+                         */
+                    } else {
+                        if condition == 1{
+                            if firstNumber * secondNumber == answerNumber {
+                                incorrectCount += 1
+                                colorIndex = 2
+                            } else if firstNumber * secondNumber != answerNumber{
+                                correctConunt += 1
+                                colorIndex = 1
+                            }
+                            
+                            presentRound += 1
+                            firstNumber = Int.random(in: 0...10)
+                            secondNumber = Int.random(in: 0...10)
+                            flagNumber = Int.random(in: 0...2)
+                            answerNumber = returnAnswerNumber(flagNumber, firstNumber, secondNumber)
+                        }
                     }
-                    if presentRound < 10 {
-                        presentRound += 1
-                        firstNumber = Int.random(in: 0...10)
-                        secondNumber = Int.random(in: 0...10)
-                        flagNumber = Int.random(in: 0...2)
-                    }
-                    
                 } label: {
                     Image(systemName: "multiply.square")
                         .imageScale(.large)
-                        .foregroundColor(.accentColor)
+                        .foregroundColor(.red)
                 }
                 Spacer()
             }.font(.largeTitle)
@@ -102,12 +150,13 @@ struct ContentView: View {
                 
                 Button {
                     presentRound = 0
-                    startBool = false
                     correctConunt = 0
                     incorrectCount = 0
+                    condition = 0
+                    colorIndex = 0
                 } label: {
-                    Text("reset")
-                }.font(.largeTitle)
+                    Text("Reset Game")
+                }.font(.largeTitle).foregroundColor(.indigo)
             }
             Group{
                 Spacer()
@@ -115,7 +164,10 @@ struct ContentView: View {
                 Spacer()
             }
         }
-        .padding()
+        .frame(maxWidth: .infinity)
+        .background(backgroundColors[colorIndex])
+        //.background(backgroundColors1[0])
+        .edgesIgnoringSafeArea(.all)
     }
     func returnAnswerNumber (_ plagNumber: Int, _ firstNum: Int, _ secondNum: Int)-> Int{
     var returnNumber: Int = Int.random(in: 0...10)
@@ -123,7 +175,7 @@ struct ContentView: View {
         case 0:
             return returnNumber
         case 1:
-            return returnNumber
+            return firstNum * secondNum
         case 2:
             return firstNum * secondNum
         default:
